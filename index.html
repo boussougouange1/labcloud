@@ -3,47 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LabCloud - Gestion Laboratoire</title>
+    <title>LabCloud - Laboratoire d'Analyses Biomédicales</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* CSS INLINE COMPLET - Copiez tout le contenu de style.css ici */
-        :root {
-            --primary: #667eea;
-            --primary-dark: #5a67d8;
-            --secondary: #764ba2;
-            --success: #48bb78;
-            --warning: #ed8936;
-            --danger: #f56565;
-            --dark: #2d3748;
-            --gray: #718096;
-            --light: #f7fafc;
-            --sidebar-width: 260px;
-            --header-height: 70px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --radius: 12px;
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: #f1f5f9;
-            color: var(--dark);
-            line-height: 1.6;
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --secondary: #6366f1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --light: #f1f5f9;
+            --sidebar-width: 280px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
         }
         
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f8fafc;
+            color: var(--dark);
+        }
+        
+        /* Auth Screens */
         .auth-screen {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
         }
         
@@ -53,13 +52,7 @@
             border-radius: var(--radius);
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
             width: 100%;
-            max-width: 420px;
-            animation: slideUp 0.5s ease;
-        }
-        
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            max-width: 450px;
         }
         
         .auth-logo {
@@ -68,23 +61,18 @@
         }
         
         .auth-logo i {
-            font-size: 48px;
+            font-size: 56px;
             color: var(--primary);
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
         
         .auth-logo h1 {
-            color: var(--dark);
-            font-size: 28px;
+            font-size: 32px;
             margin-bottom: 5px;
+            color: var(--dark);
         }
         
-        .auth-logo p {
-            color: var(--gray);
-            font-size: 14px;
-        }
-        
-        .auth-form .form-group {
+        .form-group {
             margin-bottom: 20px;
         }
         
@@ -111,7 +99,7 @@
         .form-group select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
         }
         
         .btn {
@@ -125,7 +113,6 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            text-decoration: none;
         }
         
         .btn-primary {
@@ -135,8 +122,16 @@
         
         .btn-primary:hover {
             background: var(--primary-dark);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
         }
         
         .btn-secondary {
@@ -149,23 +144,11 @@
             justify-content: center;
         }
         
-        .auth-switch {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: var(--gray);
-        }
-        
-        .auth-switch a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
-        
         .hidden {
             display: none !important;
         }
         
+        /* App Layout */
         #appScreen {
             display: flex;
             min-height: 100vh;
@@ -179,22 +162,37 @@
             height: 100vh;
             overflow-y: auto;
             z-index: 100;
+            display: flex;
+            flex-direction: column;
         }
         
         .sidebar-header {
-            padding: 20px;
+            padding: 24px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 20px;
+        }
+        
+        .sidebar-header i {
+            font-size: 32px;
+        }
+        
+        .sidebar-header h1 {
+            font-size: 24px;
             font-weight: 700;
+        }
+        
+        .sidebar-header p {
+            font-size: 12px;
+            opacity: 0.9;
         }
         
         .sidebar-menu {
             list-style: none;
             padding: 20px 0;
+            flex: 1;
         }
         
         .sidebar-menu li {
@@ -206,40 +204,30 @@
             color: var(--gray);
             transition: all 0.3s;
             border-left: 3px solid transparent;
+            margin: 4px 12px;
+            border-radius: 8px;
         }
         
         .sidebar-menu li:hover {
-            background: #f7fafc;
+            background: #f1f5f9;
             color: var(--primary);
         }
         
         .sidebar-menu li.active {
-            background: #f7fafc;
+            background: #e0f2fe;
             color: var(--primary);
             border-left-color: var(--primary);
             font-weight: 600;
         }
         
-        .sidebar-menu li.logout {
-            margin-top: 20px;
-            color: var(--danger);
+        .sidebar-menu li i {
+            width: 20px;
+            text-align: center;
         }
         
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
+        .sidebar-footer {
             padding: 20px;
-        }
-        
-        .top-header {
-            background: white;
-            padding: 20px 30px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+            border-top: 1px solid #e2e8f0;
         }
         
         .user-info {
@@ -254,9 +242,61 @@
             border-radius: 50%;
         }
         
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 24px;
+        }
+        
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .page-title h2 {
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+        
+        .page-title p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .notification-btn {
+            position: relative;
+            padding: 10px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        
+        /* Stats Cards */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
             margin-bottom: 30px;
         }
@@ -268,29 +308,27 @@
             box-shadow: var(--shadow);
             display: flex;
             align-items: center;
-            gap: 20px;
-            transition: transform 0.3s;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
+            gap: 16px;
         }
         
         .stat-icon {
-            width: 60px;
-            height: 60px;
+            width: 56px;
+            height: 56px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
             font-size: 24px;
         }
+        
+        .stat-icon.blue { background: #dbeafe; color: #2563eb; }
+        .stat-icon.green { background: #d1fae5; color: #059669; }
+        .stat-icon.yellow { background: #fef3c7; color: #d97706; }
+        .stat-icon.purple { background: #ede9fe; color: #7c3aed; }
         
         .stat-info h3 {
             font-size: 28px;
             font-weight: 700;
-            color: var(--dark);
             margin-bottom: 4px;
         }
         
@@ -302,14 +340,15 @@
         
         .stat-change {
             font-size: 12px;
-            font-weight: 600;
-            color: var(--gray);
-        }
-        
-        .stat-change.positive {
             color: var(--success);
+            font-weight: 600;
         }
         
+        .stat-change.negative {
+            color: var(--danger);
+        }
+        
+        /* Charts Section */
         .charts-row {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -326,10 +365,10 @@
         
         .chart-container h3 {
             margin-bottom: 20px;
-            color: var(--dark);
             font-size: 18px;
         }
         
+        /* Recent Lists */
         .recent-sections {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -344,47 +383,85 @@
         }
         
         .recent-box h3 {
-            margin-bottom: 20px;
-            color: var(--dark);
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .list-items {
-            space-y: 12px;
-        }
-        
-        .list-item {
-            padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 20px;
+            font-size: 18px;
         }
         
-        .empty {
+        .view-all {
+            font-size: 14px;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-info h4 {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .item-info p {
+            font-size: 12px;
             color: var(--gray);
-            font-style: italic;
-            text-align: center;
-            padding: 20px;
         }
         
+        .item-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-validated {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        /* Tables */
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            gap: 16px;
+            margin-bottom: 24px;
         }
         
-        .section-header input,
-        .section-header select {
-            padding: 10px 16px;
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
             border: 2px solid #e2e8f0;
             border-radius: 8px;
-            min-width: 250px;
+            font-size: 14px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
         }
         
         .table-container {
@@ -402,22 +479,88 @@
         th, td {
             padding: 16px;
             text-align: left;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #f1f5f9;
         }
         
         th {
-            background: #f7fafc;
+            background: #f8fafc;
             font-weight: 600;
-            color: var(--dark);
-            font-size: 14px;
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            color: var(--gray);
         }
         
         tr:hover {
-            background: #f7fafc;
+            background: #f8fafc;
         }
         
+        .patient-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .patient-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .patient-details h4 {
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+        
+        .patient-details p {
+            font-size: 12px;
+            color: var(--gray);
+        }
+        
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-homme {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge-femme {
+            background: #fce7f3;
+            color: #9d174d;
+        }
+        
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btns button {
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--gray);
+            background: #f1f5f9;
+            transition: all 0.3s;
+        }
+        
+        .action-btns button:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Modals */
         .modal {
             position: fixed;
             top: 0;
@@ -436,10 +579,10 @@
             background: white;
             border-radius: var(--radius);
             width: 90%;
-            max-width: 600px;
+            max-width: 700px;
             max-height: 90vh;
             overflow-y: auto;
-            animation: slideUp 0.3s ease;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
         }
         
         .modal-header {
@@ -452,7 +595,6 @@
         
         .modal-header h3 {
             font-size: 20px;
-            color: var(--dark);
         }
         
         .close-btn {
@@ -463,7 +605,7 @@
             color: var(--gray);
         }
         
-        .modal form {
+        .modal-body {
             padding: 24px;
         }
         
@@ -474,6 +616,10 @@
             margin-bottom: 16px;
         }
         
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+        
         .modal-footer {
             padding: 24px;
             border-top: 1px solid #e2e8f0;
@@ -482,34 +628,134 @@
             gap: 12px;
         }
         
-        .status {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: #f1f5f9;
+            padding: 6px;
+            border-radius: 8px;
         }
         
-        .status-en_cours {
-            background: #fef3c7;
-            color: #d97706;
+        .tab {
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
         }
         
-        .status-termine {
-            background: #d1fae5;
+        .tab.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        /* Settings */
+        .settings-card {
+            background: white;
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        
+        .settings-card h4 {
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+        
+        .settings-card p {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .danger-zone {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .danger-zone h5 {
+            color: var(--danger);
+            margin-bottom: 8px;
+        }
+        
+        .danger-zone p {
+            color: #991b1b;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        
+        /* Report Preview */
+        .report-preview {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 40px;
+            font-family: 'Times New Roman', serif;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .report-header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .report-header h2 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .report-header p {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .report-section {
+            margin-bottom: 24px;
+        }
+        
+        .report-section h4 {
+            background: #f8fafc;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dotted #ccc;
+        }
+        
+        .result-value {
+            font-weight: bold;
+        }
+        
+        .result-normal {
             color: #059669;
+            font-size: 12px;
         }
         
-        .status-livre {
-            background: #dbeafe;
-            color: #2563eb;
+        .result-abnormal {
+            color: #dc2626;
+            font-weight: bold;
         }
         
         @media (max-width: 1024px) {
-            .charts-row {
-                grid-template-columns: 1fr;
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
-            .recent-sections {
+            .charts-row, .recent-sections {
                 grid-template-columns: 1fr;
             }
         }
@@ -537,9 +783,9 @@
             <div class="auth-logo">
                 <i class="fas fa-flask"></i>
                 <h1>LabCloud</h1>
-                <p>Gestion Laboratoire</p>
+                <p>Laboratoire d'Analyses Biomédicales</p>
             </div>
-            <form id="loginForm" class="auth-form">
+            <form id="loginForm">
                 <div class="form-group">
                     <label><i class="fas fa-envelope"></i> Email</label>
                     <input type="email" id="loginEmail" required placeholder="admin@labcloud.com">
@@ -551,7 +797,9 @@
                 <button type="submit" class="btn btn-primary btn-block">
                     <i class="fas fa-sign-in-alt"></i> Connexion
                 </button>
-                <p class="auth-switch">Pas encore de compte ? <a href="#" onclick="showRegister(); return false;">S'inscrire</a></p>
+                <p style="text-align: center; margin-top: 20px; color: var(--gray);">
+                    Pas encore de compte ? <a href="#" onclick="showRegister(); return false;" style="color: var(--primary); text-decoration: none; font-weight: 600;">S'inscrire</a>
+                </p>
             </form>
         </div>
     </div>
@@ -563,14 +811,14 @@
                 <i class="fas fa-flask"></i>
                 <h1>LabCloud</h1>
             </div>
-            <form id="registerForm" class="auth-form">
+            <form id="registerForm">
                 <div class="form-group">
                     <label>Nom du laboratoire</label>
-                    <input type="text" id="regLabName" required>
+                    <input type="text" id="regLabName" required placeholder="Ex: Sounou Diagnostics">
                 </div>
                 <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="regEmail" required>
+                    <label>Email professionnel</label>
+                    <input type="email" id="regEmail" required placeholder="contact@lab.com">
                 </div>
                 <div class="form-group">
                     <label>Mot de passe</label>
@@ -578,23 +826,27 @@
                 </div>
                 <div class="form-group">
                     <label>Téléphone</label>
-                    <input type="tel" id="regPhone">
+                    <input type="tel" id="regPhone" placeholder="+241 XX XX XX XX">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">
                     <i class="fas fa-user-plus"></i> Créer le compte
                 </button>
-                <p class="auth-switch">Déjà un compte ? <a href="#" onclick="showLogin(); return false;">Se connecter</a></p>
+                <p style="text-align: center; margin-top: 20px; color: var(--gray);">
+                    Déjà un compte ? <a href="#" onclick="showLogin(); return false;" style="color: var(--primary); text-decoration: none; font-weight: 600;">Se connecter</a>
+                </p>
             </form>
         </div>
     </div>
 
     <!-- Main Application -->
     <div id="appScreen" class="hidden">
-        <!-- Sidebar -->
         <nav class="sidebar">
             <div class="sidebar-header">
                 <i class="fas fa-flask"></i>
-                <span>LabCloud</span>
+                <div>
+                    <h1>LabCloud</h1>
+                    <p>Laboratoire</p>
+                </div>
             </div>
             <ul class="sidebar-menu">
                 <li class="active" onclick="showSection('dashboard')">
@@ -606,70 +858,88 @@
                 <li onclick="showSection('analyses')">
                     <i class="fas fa-vial"></i> Analyses
                 </li>
-                <li onclick="showSection('factures')">
-                    <i class="fas fa-file-invoice-dollar"></i> Factures
+                <li onclick="showSection('facturation')">
+                    <i class="fas fa-file-invoice-dollar"></i> Facturation & Devis
                 </li>
-                <li onclick="showSection('rapports')">
-                    <i class="fas fa-chart-bar"></i> Rapports
-                </li>
-                <li class="logout" onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                <li onclick="showSection('parametres')">
+                    <i class="fas fa-cog"></i> Paramètres
                 </li>
             </ul>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=0ea5e9&color=fff" alt="User" id="userAvatar">
+                    <div>
+                        <div style="font-weight: 600;" id="userName">Admin</div>
+                        <div style="font-size: 12px; color: var(--gray);">Laboratoire</div>
+                    </div>
+                </div>
+                <button onclick="logout()" style="margin-top: 12px; width: 100%;" class="btn btn-secondary">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                </button>
+            </div>
         </nav>
 
-        <!-- Main Content -->
         <main class="main-content">
-            <!-- Header -->
-            <header class="top-header">
-                <h2 id="pageTitle">Tableau de bord</h2>
-                <div class="user-info">
-                    <span id="userName">Admin</span>
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=667eea&color=fff" alt="User">
-                </div>
-            </header>
-
             <!-- Dashboard Section -->
             <section id="dashboardSection" class="content-section">
+                <div class="top-header">
+                    <div class="page-title">
+                        <h2>Tableau de bord</h2>
+                        <p>Bienvenue dans votre espace de gestion laboratoire</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="notification-btn">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">3</span>
+                        </button>
+                        <button class="btn btn-primary" onclick="openModal('patientModal')">
+                            <i class="fas fa-plus"></i> Nouveau patient
+                        </button>
+                        <button class="btn btn-success" onclick="openModal('analyseModal')">
+                            <i class="fas fa-plus"></i> Nouvelle analyse
+                        </button>
+                    </div>
+                </div>
+
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-icon" style="background: #667eea;">
+                        <div class="stat-icon blue">
                             <i class="fas fa-users"></i>
                         </div>
                         <div class="stat-info">
-                            <h3 id="totalPatients">0</h3>
+                            <h3 id="statPatients">0</h3>
                             <p>Total Patients</p>
-                            <span class="stat-change positive">+12% ce mois</span>
+                            <span class="stat-change">+12% ce mois</span>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background: #f093fb;">
+                        <div class="stat-icon green">
                             <i class="fas fa-vial"></i>
                         </div>
                         <div class="stat-info">
-                            <h3 id="totalAnalyses">0</h3>
+                            <h3 id="statAnalyses">0</h3>
                             <p>Analyses</p>
-                            <span class="stat-change" id="analysesEnCours">0 en cours</span>
+                            <span class="stat-change" style="color: var(--warning);">0 en cours</span>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background: #4facfe;">
+                        <div class="stat-icon yellow">
                             <i class="fas fa-file-invoice"></i>
                         </div>
                         <div class="stat-info">
-                            <h3 id="totalFactures">0</h3>
+                            <h3 id="statFactures">0</h3>
                             <p>Factures</p>
-                            <span class="stat-change positive">+8% ce mois</span>
+                            <span class="stat-change">+8% ce mois</span>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background: #43e97b;">
+                        <div class="stat-icon purple">
                             <i class="fas fa-money-bill-wave"></i>
                         </div>
                         <div class="stat-info">
-                            <h3 id="totalRevenus">0 FCFA</h3>
+                            <h3 id="statRevenus">0 FCFA</h3>
                             <p>Revenus</p>
-                            <span class="stat-change" id="revenusRestants">0 FCFA restants</span>
+                            <span class="stat-change negative" id="statRestant">0 FCFA restants</span>
                         </div>
                     </div>
                 </div>
@@ -677,25 +947,42 @@
                 <div class="charts-row">
                     <div class="chart-container">
                         <h3>Évolution des revenus</h3>
-                        <canvas id="revenueChart"></canvas>
+                        <canvas id="revenueChart" height="250"></canvas>
                     </div>
                     <div class="chart-container">
                         <h3>Analyses par type</h3>
-                        <canvas id="analysesTypeChart"></canvas>
+                        <canvas id="analysesChart" height="250"></canvas>
                     </div>
                 </div>
 
                 <div class="recent-sections">
                     <div class="recent-box">
-                        <h3><i class="fas fa-clock"></i> Analyses récentes</h3>
-                        <div id="recentAnalysesList" class="list-items">
-                            <p class="empty">Aucune analyse enregistrée</p>
+                        <h3>
+                            <span><i class="fas fa-clock"></i> Analyses récentes</span>
+                            <span class="view-all" onclick="showSection('analyses')">Voir tout</span>
+                        </h3>
+                        <div id="recentAnalysesList">
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>NFS - Mme BOUSSOUGOU Edith</h4>
+                                    <p>Hématologie • Aujourd'hui</p>
+                                </div>
+                                <span class="item-status status-validated">Validée</span>
+                            </div>
                         </div>
                     </div>
                     <div class="recent-box">
-                        <h3><i class="fas fa-user-clock"></i> Patients récents</h3>
-                        <div id="recentPatientsList" class="list-items">
-                            <p class="empty">Aucun patient enregistré</p>
+                        <h3>
+                            <span><i class="fas fa-user-clock"></i> Patients récents</span>
+                            <span class="view-all" onclick="showSection('patients')">Voir tout</span>
+                        </h3>
+                        <div id="recentPatientsList">
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <h4>Edith BOUSSOUGOU</h4>
+                                    <p>+241 XX XX XX XX • Inscrite aujourd'hui</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -703,68 +990,96 @@
 
             <!-- Patients Section -->
             <section id="patientsSection" class="content-section hidden">
-                <div class="section-header">
-                    <button class="btn btn-primary" onclick="openPatientModal()">
-                        <i class="fas fa-plus"></i> Nouveau Patient
+                <div class="top-header">
+                    <div class="page-title">
+                        <h2>Gestion des Patients</h2>
+                        <p>Gérez les informations de vos patients</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="openModal('patientModal')">
+                        <i class="fas fa-plus"></i> Nouveau patient
                     </button>
-                    <input type="search" id="searchPatients" placeholder="Rechercher un patient..." onkeyup="searchPatients()">
                 </div>
+
+                <div class="section-header">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchPatients" placeholder="Rechercher un patient par nom ou téléphone..." onkeyup="searchPatients()">
+                    </div>
+                </div>
+
                 <div class="table-container">
-                    <table id="patientsTable">
+                    <table>
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Nom</th>
-                                <th>Téléphone</th>
-                                <th>Email</th>
-                                <th>Sexe</th>
-                                <th>Age</th>
+                                <th>Patient</th>
+                                <th>Contact</th>
+                                <th>Âge / Sexe</th>
+                                <th>Date d'inscription</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="patientsList"></tbody>
+                        <tbody id="patientsTableBody">
+                            <!-- Dynamic content -->
+                        </tbody>
                     </table>
                 </div>
             </section>
 
             <!-- Analyses Section -->
             <section id="analysesSection" class="content-section hidden">
-                <div class="section-header">
-                    <button class="btn btn-primary" onclick="openAnalyseModal()">
-                        <i class="fas fa-plus"></i> Nouvelle Analyse
+                <div class="top-header">
+                    <div class="page-title">
+                        <h2>Analyses Médicales</h2>
+                        <p>Gérez les analyses et résultats</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="openModal('analyseModal')">
+                        <i class="fas fa-plus"></i> Nouvelle analyse
                     </button>
-                    <select id="filterStatus" onchange="loadAnalyses()">
-                        <option value="">Tous les statuts</option>
-                        <option value="en_cours">En cours</option>
-                        <option value="termine">Terminé</option>
-                        <option value="livre">Livré</option>
-                    </select>
                 </div>
+
                 <div class="table-container">
-                    <table id="analysesTable">
+                    <table>
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>N° Analyse</th>
                                 <th>Patient</th>
-                                <th>Type d'analyse</th>
+                                <th>Type</th>
                                 <th>Date</th>
                                 <th>Statut</th>
-                                <th>Prix</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="analysesList"></tbody>
+                        <tbody id="analysesTableBody">
+                            <!-- Dynamic content -->
+                        </tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- Factures Section -->
-            <section id="facturesSection" class="content-section hidden">
-                <div class="section-header">
-                    <h3>Liste des Factures</h3>
+            <!-- Facturation Section -->
+            <section id="facturationSection" class="content-section hidden">
+                <div class="top-header">
+                    <div class="page-title">
+                        <h2>Facturation & Devis</h2>
+                        <p>Gérez vos factures et devis</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" onclick="openModal('devisModal')">
+                            <i class="fas fa-file-alt"></i> Nouveau devis
+                        </button>
+                        <button class="btn btn-primary" onclick="openModal('factureModal')">
+                            <i class="fas fa-plus"></i> Nouvelle facture
+                        </button>
+                    </div>
                 </div>
-                <div class="table-container">
-                    <table id="facturesTable">
+
+                <div class="tabs">
+                    <div class="tab active" onclick="showFactureTab('factures')">Factures</div>
+                    <div class="tab" onclick="showFactureTab('devis')">Devis</div>
+                </div>
+
+                <div class="table-container" id="facturesTab">
+                    <table>
                         <thead>
                             <tr>
                                 <th>N° Facture</th>
@@ -775,8 +1090,186 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="facturesList"></tbody>
+                        <tbody id="facturesTableBody">
+                            <!-- Dynamic content -->
+                        </tbody>
                     </table>
+                </div>
+
+                <div class="table-container hidden" id="devisTab">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>N° Devis</th>
+                                <th>Patient</th>
+                                <th>Date</th>
+                                <th>Montant estimé</th>
+                                <th>Validité</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="devisTableBody">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Paramètres Section -->
+            <section id="parametresSection" class="content-section hidden">
+                <div class="top-header">
+                    <div class="page-title">
+                        <h2>Paramètres</h2>
+                        <p>Configurez votre laboratoire et vos préférences</p>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active" onclick="showSettingsTab('lab')">Laboratoire</div>
+                    <div class="tab" onclick="showSettingsTab('user')">Utilisateur</div>
+                    <div class="tab" onclick="showSettingsTab('notifications')">Notifications</div>
+                    <div class="tab" onclick="showSettingsTab('data')">Données</div>
+                </div>
+
+                <div id="settingsLab" class="settings-content">
+                    <div class="settings-card">
+                        <h4>Informations du laboratoire</h4>
+                        <p>Ces informations apparaîtront sur vos rapports et factures</p>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nom du laboratoire</label>
+                                <input type="text" id="labName" value="Sounou Diagnostics Bio-Systèmes">
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="labEmail" value="sounoudiagnostics@yahoo.fr">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Téléphone</label>
+                                <input type="tel" id="labPhone" value="077358742 / 062683011">
+                            </div>
+                            <div class="form-group">
+                                <label>Site web</label>
+                                <input type="url" id="labWebsite">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Boîte postale</label>
+                                <input type="text" id="labBP" value="7215">
+                            </div>
+                            <div class="form-group">
+                                <label>Ville</label>
+                                <input type="text" id="labCity" value="Libreville">
+                            </div>
+                        </div>
+                        <div class="form-group full">
+                            <label>Adresse</label>
+                            <input type="text" id="labAddress" value="LA PEIRY">
+                        </div>
+                        <div style="text-align: right;">
+                            <button class="btn btn-primary" onclick="saveLabSettings()">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="settingsUser" class="settings-content hidden">
+                    <div class="settings-card">
+                        <h4>Profil utilisateur</h4>
+                        <p>Gérez vos informations personnelles</p>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nom complet</label>
+                                <input type="text" id="userFullName" value="Administrateur">
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="userEmail" value="boussougouang1@gmail.com">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Téléphone</label>
+                                <input type="tel" id="userPhone" value="+14162688">
+                            </div>
+                            <div class="form-group">
+                                <label>Rôle</label>
+                                <input type="text" value="Administrateur" disabled style="background: #f1f5f9;">
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <button class="btn btn-primary" onclick="saveUserSettings()">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="settingsNotifications" class="settings-content hidden">
+                    <div class="settings-card">
+                        <h4>Paramètres de notification</h4>
+                        <p>Choisissez quand et comment vous souhaitez être notifié</p>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #f1f5f9;">
+                            <div>
+                                <div style="font-weight: 600;">Notifications par email</div>
+                                <div style="font-size: 14px; color: var(--gray);">Recevoir les notifications par email</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked style="width: 50px; height: 24px; accent-color: var(--primary);">
+                            </label>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #f1f5f9;">
+                            <div>
+                                <div style="font-weight: 600;">Notifications par SMS</div>
+                                <div style="font-size: 14px; color: var(--gray);">Recevoir les notifications par SMS</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" style="width: 50px; height: 24px; accent-color: var(--primary);">
+                            </label>
+                        </div>
+                        
+                        <div style="text-align: right; margin-top: 20px;">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="settingsData" class="settings-content hidden">
+                    <div class="settings-card">
+                        <h4>Gestion des données</h4>
+                        <p>Sauvegardez et gérez vos données</p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                            <div style="background: #f8fafc; padding: 20px; border-radius: 8px;">
+                                <div style="font-weight: 600; margin-bottom: 8px;"><i class="fas fa-download"></i> Exporter les données</div>
+                                <p style="font-size: 14px; color: var(--gray); margin-bottom: 12px;">Téléchargez une sauvegarde de toutes vos données</p>
+                                <button class="btn btn-secondary" onclick="exportData()">
+                                    Exporter
+                                </button>
+                            </div>
+                            
+                            <div style="background: #f8fafc; padding: 20px; border-radius: 8px;">
+                                <div style="font-weight: 600; margin-bottom: 8px;"><i class="fas fa-shield-alt"></i> Stockage local</div>
+                                <p style="font-size: 14px; color: var(--gray);">Toutes vos données sont stockées localement dans votre navigateur</p>
+                            </div>
+                        </div>
+                        
+                        <div class="danger-zone">
+                            <h5><i class="fas fa-exclamation-triangle"></i> Zone dangereuse</h5>
+                            <p>La suppression des données est irréversible</p>
+                            <button class="btn btn-danger" onclick="clearAllData()">
+                                <i class="fas fa-trash"></i> Supprimer toutes les données
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
@@ -786,56 +1279,46 @@
     <div id="patientModal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Nouveau Patient</h3>
+                <h3>Nouveau patient</h3>
                 <button class="close-btn" onclick="closeModal('patientModal')">&times;</button>
             </div>
             <form id="patientForm" onsubmit="savePatient(event)">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Nom complet *</label>
-                        <input type="text" id="patNom" required>
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Prénom *</label>
+                            <input type="text" id="patPrenom" required placeholder="Prénom">
+                        </div>
+                        <div class="form-group">
+                            <label>Nom *</label>
+                            <input type="text" id="patNom" required placeholder="Nom">
+                        </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Date de naissance *</label>
+                            <input type="date" id="patDateNaissance" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Sexe *</label>
+                            <select id="patSexe" required>
+                                <option value="M">Homme</option>
+                                <option value="F">Femme</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group full">
                         <label>Téléphone *</label>
-                        <input type="tel" id="patPhone" required>
+                        <input type="tel" id="patTelephone" required placeholder="+241 XX XX XX XX">
                     </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
+                    <div class="form-group full">
                         <label>Email</label>
-                        <input type="email" id="patEmail">
+                        <input type="email" id="patEmail" placeholder="email@exemple.com">
                     </div>
-                    <div class="form-group">
-                        <label>Date de naissance</label>
-                        <input type="date" id="patDateNaissance">
+                    <div class="form-group full">
+                        <label>Adresse</label>
+                        <input type="text" id="patAdresse" placeholder="Adresse du patient">
                     </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Sexe</label>
-                        <select id="patSexe">
-                            <option value="M">Masculin</option>
-                            <option value="F">Féminin</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Groupe sanguin</label>
-                        <select id="patGroupeSanguin">
-                            <option value="">Non spécifié</option>
-                            <option value="A+">A+</option>
-                            <option value="A-">A-</option>
-                            <option value="B+">B+</option>
-                            <option value="B-">B-</option>
-                            <option value="AB+">AB+</option>
-                            <option value="AB-">AB-</option>
-                            <option value="O+">O+</option>
-                            <option value="O-">O-</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Adresse</label>
-                    <textarea id="patAdresse" rows="2"></textarea>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('patientModal')">Annuler</button>
@@ -849,42 +1332,159 @@
     <div id="analyseModal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Nouvelle Analyse</h3>
+                <h3>Nouvelle analyse</h3>
                 <button class="close-btn" onclick="closeModal('analyseModal')">&times;</button>
             </div>
             <form id="analyseForm" onsubmit="saveAnalyse(event)">
-                <div class="form-row">
-                    <div class="form-group">
+                <div class="modal-body">
+                    <div class="form-group full">
                         <label>Patient *</label>
-                        <select id="anaPatient" required></select>
-                    </div>
-                    <div class="form-group">
-                        <label>Type d'analyse *</label>
-                        <select id="anaType" required>
-                            <option value="NFS">NFS (Numération Formule Sanguine)</option>
-                            <option value="BIOCHIMIE">Biochimie sanguine</option>
-                            <option value="SEROLOGIE">Sérologie</option>
-                            <option value="URINE">Analyse d'urine</option>
-                            <option value="SANG">Groupe sanguin + Rhesus</option>
-                            <option value="COVID">Test COVID-19</option>
-                            <option value="MICRO">Microbiologie</option>
-                            <option value="HORMONES">Hormones</option>
+                        <select id="anaPatient" required style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0;">
+                            <option value="">Sélectionner un patient</option>
                         </select>
                     </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Médecin prescripteur</label>
-                        <input type="text" id="anaMedecin" placeholder="Dr. ">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Type d'analyse *</label>
+                            <select id="anaType" required onchange="showAnalyseFields()">
+                                <option value="">Choisir...</option>
+                                <option value="NFS">NFS (Hémogramme)</option>
+                                <option value="BIOCHIMIE">Biochimie sanguine</option>
+                                <option value="SEROLOGIE">Sérologie</option>
+                                <option value="CRP">CRP</option>
+                                <option value="WIDAL">Widal & Felix</option>
+                                <option value="URINE">Analyse d'urine</option>
+                                <option value="SANG">Groupe sanguin + Rhésus</option>
+                                <option value="COVID">Test COVID-19</option>
+                                <option value="PARASITO">Parasitologie (GE)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Médecin prescripteur</label>
+                            <input type="text" id="anaMedecin" placeholder="Dr. ...">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Prix (FCFA) *</label>
-                        <input type="number" id="anaPrix" required min="0">
+                    
+                    <!-- Dynamic fields for NFS -->
+                    <div id="nfsFields" class="analyse-fields hidden">
+                        <h4 style="margin: 16px 0 12px; color: var(--primary);">Paramètres NFS</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Leucocytes (10³/mm³)</label>
+                                <input type="number" step="0.1" id="nfsLeuco" placeholder="4.0 - 10.0">
+                            </div>
+                            <div class="form-group">
+                                <label>Hématies (10⁶/mm³)</label>
+                                <input type="number" step="0.01" id="nfsHema" placeholder="4.2 - 5.4">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Hémoglobine (g/dl)</label>
+                                <input type="number" step="0.1" id="nfsHemo" placeholder="12 - 16">
+                            </div>
+                            <div class="form-group">
+                                <label>Hématocrite (%)</label>
+                                <input type="number" step="0.1" id="nfsHemat" placeholder="37 - 47">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Plaquettes (/mm³)</label>
+                                <input type="number" id="nfsPlaq" placeholder="150000 - 350000">
+                            </div>
+                            <div class="form-group">
+                                <label>Neutrophiles (%)</label>
+                                <input type="number" id="nfsNeutro" placeholder="50 - 75">
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Notes</label>
-                    <textarea id="anaNotes" rows="3"></textarea>
+
+                    <!-- Dynamic fields for CRP -->
+                    <div id="crpFields" class="analyse-fields hidden">
+                        <h4 style="margin: 16px 0 12px; color: var(--primary);">Résultat CRP</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>CRP (mg/L)</label>
+                                <input type="number" step="0.1" id="crpValue" placeholder="0 - 6">
+                            </div>
+                            <div class="form-group">
+                                <label>Interprétation</label>
+                                <select id="crpInterp">
+                                    <option value="normal">Normal (< 6 mg/L)</option>
+                                    <option value="positive">Positive (> 6 mg/L)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic fields for Widal -->
+                    <div id="widalFields" class="analyse-fields hidden">
+                        <h4 style="margin: 16px 0 12px; color: var(--primary);">Séro-diagnostic Widal & Felix</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>TO</label>
+                                <select id="widalTO">
+                                    <option value="negatif">Négatif</option>
+                                    <option value="1/40">1/40</option>
+                                    <option value="1/80">1/80</option>
+                                    <option value="1/160">1/160</option>
+                                    <option value="1/320">1/320</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>TH</label>
+                                <select id="widalTH">
+                                    <option value="negatif">Négatif</option>
+                                    <option value="1/40">1/40</option>
+                                    <option value="1/80">1/80</option>
+                                    <option value="1/160">1/160</option>
+                                    <option value="1/320">1/320</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>AO</label>
+                                <select id="widalAO">
+                                    <option value="negatif">Négatif</option>
+                                    <option value="1/40">1/40</option>
+                                    <option value="1/80">1/80</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>AH</label>
+                                <select id="widalAH">
+                                    <option value="negatif">Négatif</option>
+                                    <option value="1/40">1/40</option>
+                                    <option value="1/80">1/80</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>BO</label>
+                                <select id="widalBO">
+                                    <option value="negatif">Négatif</option>
+                                    <option value="1/40">1/40</option>
+                                    <option value="1/80">1/80</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>BH</label>
+                                <select id="widalBH">
+                                    <option value="negatif">Négatif</option>
+                                    <option value="1/40">1/40</option>
+                                    <option value="1/80">1/80</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Notes / Commentaires</label>
+                        <textarea id="anaNotes" rows="3" placeholder="Résultats détaillés..."></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('analyseModal')">Annuler</button>
@@ -894,379 +1494,73 @@
         </div>
     </div>
 
+    <!-- Report Modal -->
+    <div id="reportModal" class="modal hidden">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3>Résultat d'analyse</h3>
+                <div>
+                    <button class="btn btn-secondary" onclick="closeModal('reportModal')">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                    <button class="btn btn-primary" onclick="printReport()">
+                        <i class="fas fa-print"></i> Imprimer
+                    </button>
+                    <button class="btn btn-success" onclick="downloadPDF()">
+                        <i class="fas fa-download"></i> PDF
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div id="reportContent" class="report-preview">
+                    <!-- Dynamic report content -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Configuration Supabase - REMPLACEZ PAR VOS CLÉS
-        const SUPABASE_URL = 'https://cnmrxpzomhodinvegtdv.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNubXJ4cHpvbWhvZGludmVndGR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTg3MzUsImV4cCI6MjA5MjE3NDczNX0.EdVDBc-3nsnBDV-a0pjl64SBwQ6I5muP3HAR1ooFZos';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_KEY = 'your-anon-key';
+        let supabaseClient;
+        
+        try {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } catch (e) {
+            console.log('Supabase non configuré - mode démo activé');
+        }
 
-        // État global
-        let currentUser = null;
-        let currentLab = null;
-        let patients = [];
-        let analyses = [];
-        let revenueChart = null;
-        let analysesChart = null;
+        // Data storage (localStorage fallback)
+        let db = {
+            patients: JSON.parse(localStorage.getItem('lab_patients') || '[]'),
+            analyses: JSON.parse(localStorage.getItem('lab_analyses') || '[]'),
+            factures: JSON.parse(localStorage.getItem('lab_factures') || '[]'),
+            devis: JSON.parse(localStorage.getItem('lab_devis') || '[]'),
+            labInfo: JSON.parse(localStorage.getItem('lab_info') || '{}'),
+            currentUser: JSON.parse(localStorage.getItem('lab_user') || 'null')
+        };
 
-        // Initialisation
+        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            checkAuth();
+            if (db.currentUser) {
+                showApp();
+            } else {
+                showLogin();
+            }
             
-            // Formulaires
-            document.getElementById('loginForm').addEventListener('submit', handleLogin);
-            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+            // Form handlers
+            document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
+            document.getElementById('registerForm')?.addEventListener('submit', handleRegister);
+            
+            // Load initial data
+            loadPatients();
+            loadAnalyses();
+            loadFactures();
+            initCharts();
         });
 
-        // Vérification auth
-        async function checkAuth() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) {
-                currentUser = session.user;
-                await loadUserProfile();
-                showApp();
-            } else {
-                showLogin();
-            }
-        }
-
-        // Connexion
-        async function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            try {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email,
-                    password
-                });
-                
-                if (error) throw error;
-                
-                currentUser = data.user;
-                await loadUserProfile();
-                showApp();
-            } catch (error) {
-                alert('Erreur de connexion: ' + error.message);
-            }
-        }
-
-        // Inscription
-        async function handleRegister(e) {
-            e.preventDefault();
-            const labName = document.getElementById('regLabName').value;
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
-            const phone = document.getElementById('regPhone').value;
-            
-            try {
-                // 1. Créer l'utilisateur auth
-                const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-                    email,
-                    password
-                });
-                
-                if (authError) throw authError;
-                
-                // 2. Créer le laboratoire (company)
-                const { data: labData, error: labError } = await supabaseClient
-                    .from('laboratoires')
-                    .insert([{
-                        nom: labName,
-                        email: email,
-                        telephone: phone,
-                        statut: 'actif'
-                    }])
-                    .select()
-                    .single();
-                    
-                if (labError) throw labError;
-                
-                // 3. Créer le profil utilisateur
-                const { error: profileError } = await supabaseClient
-                    .from('profiles')
-                    .insert([{
-                        id: authData.user.id,
-                        email: email,
-                        laboratoire_id: labData.id,
-                        role: 'admin',
-                        nom: labName
-                    }]);
-                    
-                if (profileError) throw profileError;
-                
-                alert('Compte créé avec succès! Vous pouvez maintenant vous connecter.');
-                showLogin();
-            } catch (error) {
-                alert('Erreur: ' + error.message);
-            }
-        }
-
-        // Charger profil utilisateur
-        async function loadUserProfile() {
-            const { data, error } = await supabaseClient
-                .from('profiles')
-                .select('*, laboratoires(*)')
-                .eq('id', currentUser.id)
-                .single();
-                
-            if (data) {
-                currentLab = data.laboratoires;
-                document.getElementById('userName').textContent = data.nom || data.email;
-            }
-        }
-
-        // Navigation
-        function showSection(section) {
-            // Cacher toutes les sections
-            document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
-            document.getElementById(section + 'Section').classList.remove('hidden');
-            
-            // Mettre à jour menu actif
-            document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
-            event.target.closest('li').classList.add('active');
-            
-            // Mettre à jour titre
-            const titles = {
-                'dashboard': 'Tableau de bord',
-                'patients': 'Gestion des Patients',
-                'analyses': 'Analyses Médicales',
-                'factures': 'Facturation'
-            };
-            document.getElementById('pageTitle').textContent = titles[section];
-            
-            // Charger données spécifiques
-            if (section === 'dashboard') loadDashboard();
-            if (section === 'patients') loadPatients();
-            if (section === 'analyses') loadAnalyses();
-            if (section === 'factures') loadFactures();
-        }
-
-        // Dashboard
-        async function loadDashboard() {
-            if (!currentLab) return;
-            
-            // Stats
-            const { count: patientCount } = await supabaseClient
-                .from('patients')
-                .select('*', { count: 'exact', head: true })
-                .eq('laboratoire_id', currentLab.id);
-                
-            const { count: analyseCount } = await supabaseClient
-                .from('analyses')
-                .select('*', { count: 'exact', head: true })
-                .eq('laboratoire_id', currentLab.id);
-                
-            const { count: encoursCount } = await supabaseClient
-                .from('analyses')
-                .select('*', { count: 'exact', head: true })
-                .eq('laboratoire_id', currentLab.id)
-                .eq('statut', 'en_cours');
-            
-            document.getElementById('totalPatients').textContent = patientCount || 0;
-            document.getElementById('totalAnalyses').textContent = analyseCount || 0;
-            document.getElementById('analysesEnCours').textContent = (encoursCount || 0) + ' en cours';
-            
-            // Revenus
-            const { data: revenus } = await supabaseClient
-                .from('analyses')
-                .select('prix')
-                .eq('laboratoire_id', currentLab.id)
-                .eq('statut', 'paye');
-                
-            const totalRevenus = revenus?.reduce((sum, a) => sum + (a.prix || 0), 0) || 0;
-            document.getElementById('totalRevenus').textContent = totalRevenus.toLocaleString() + ' FCFA';
-            
-            // Charts
-            initCharts();
-        }
-
-        // Patients
-        async function loadPatients() {
-            if (!currentLab) return;
-            
-            const { data, error } = await supabaseClient
-                .from('patients')
-                .select('*')
-                .eq('laboratoire_id', currentLab.id)
-                .order('created_at', { ascending: false });
-                
-            if (data) {
-                patients = data;
-                renderPatientsTable(data);
-                updatePatientSelect(data);
-            }
-        }
-
-        function renderPatientsTable(data) {
-            const tbody = document.getElementById('patientsList');
-            if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="empty">Aucun patient enregistré</td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = data.map(p => `
-                <tr>
-                    <td>#${p.id.toString().slice(0,4)}</td>
-                    <td><strong>${p.nom}</strong></td>
-                    <td>${p.telephone || '-'}</td>
-                    <td>${p.email || '-'}</td>
-                    <td>${p.sexe === 'M' ? 'Masculin' : p.sexe === 'F' ? 'Féminin' : '-'}</td>
-                    <td>${p.date_naissance ? calculateAge(p.date_naissance) + ' ans' : '-'}</td>
-                    <td>
-                        <button class="btn btn-sm" onclick="editPatient('${p.id}')" style="padding: 6px 12px; font-size: 12px;"><i class="fas fa-edit"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function updatePatientSelect(patients) {
-            const select = document.getElementById('anaPatient');
-            if (!select) return;
-            select.innerHTML = patients.map(p => 
-                `<option value="${p.id}">${p.nom} (${p.telephone || 'pas de tel'})</option>`
-            ).join('');
-        }
-
-        // Analyses
-        async function loadAnalyses() {
-            if (!currentLab) return;
-            
-            const filter = document.getElementById('filterStatus').value;
-            let query = supabaseClient
-                .from('analyses')
-                .select('*, patients(nom)')
-                .eq('laboratoire_id', currentLab.id)
-                .order('created_at', { ascending: false });
-                
-            if (filter) query = query.eq('statut', filter);
-            
-            const { data, error } = await query;
-            if (data) {
-                analyses = data;
-                renderAnalysesTable(data);
-            }
-        }
-
-        function renderAnalysesTable(data) {
-            const tbody = document.getElementById('analysesList');
-            if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="empty">Aucune analyse enregistrée</td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = data.map(a => `
-                <tr>
-                    <td>A-${a.id.toString().slice(0,4)}</td>
-                    <td>${a.patients?.nom || 'N/A'}</td>
-                    <td>${a.type_analyse}</td>
-                    <td>${new Date(a.created_at).toLocaleDateString('fr-FR')}</td>
-                    <td><span class="status status-${a.statut}">${a.statut.replace('_', ' ')}</span></td>
-                    <td>${a.prix?.toLocaleString()} FCFA</td>
-                    <td>
-                        <button class="btn btn-sm" style="padding: 6px 12px; font-size: 12px;"><i class="fas fa-eye"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // Sauvegardes
-        async function savePatient(e) {
-            e.preventDefault();
-            if (!currentLab) return;
-            
-            const patient = {
-                laboratoire_id: currentLab.id,
-                nom: document.getElementById('patNom').value,
-                telephone: document.getElementById('patPhone').value,
-                email: document.getElementById('patEmail').value,
-                date_naissance: document.getElementById('patDateNaissance').value,
-                sexe: document.getElementById('patSexe').value,
-                groupe_sanguin: document.getElementById('patGroupeSanguin').value,
-                adresse: document.getElementById('patAdresse').value
-            };
-            
-            const { error } = await supabaseClient.from('patients').insert([patient]);
-            if (error) {
-                alert('Erreur: ' + error.message);
-            } else {
-                closeModal('patientModal');
-                loadPatients();
-                document.getElementById('patientForm').reset();
-            }
-        }
-
-        async function saveAnalyse(e) {
-            e.preventDefault();
-            if (!currentLab) return;
-            
-            const analyse = {
-                laboratoire_id: currentLab.id,
-                patient_id: document.getElementById('anaPatient').value,
-                type_analyse: document.getElementById('anaType').value,
-                medecin: document.getElementById('anaMedecin').value,
-                prix: parseInt(document.getElementById('anaPrix').value),
-                notes: document.getElementById('anaNotes').value,
-                statut: 'en_cours'
-            };
-            
-            const { error } = await supabaseClient.from('analyses').insert([analyse]);
-            if (error) {
-                alert('Erreur: ' + error.message);
-            } else {
-                closeModal('analyseModal');
-                loadAnalyses();
-                document.getElementById('analyseForm').reset();
-            }
-        }
-
-        // Charts
-        function initCharts() {
-            const ctx1 = document.getElementById('revenueChart');
-            const ctx2 = document.getElementById('analysesTypeChart');
-            
-            if (!ctx1 || !ctx2) return;
-            
-            if (revenueChart) revenueChart.destroy();
-            if (analysesChart) analysesChart.destroy();
-            
-            revenueChart = new Chart(ctx1, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
-                    datasets: [{
-                        label: 'Revenus (FCFA)',
-                        data: [150000, 230000, 180000, 320000, 290000, 450000],
-                        borderColor: '#667eea',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-            
-            analysesChart = new Chart(ctx2, {
-                type: 'doughnut',
-                data: {
-                    labels: ['NFS', 'Biochimie', 'Sérologie', 'Urines', 'Autres'],
-                    datasets: [{
-                        data: [30, 25, 20, 15, 10],
-                        backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { position: 'bottom' } }
-                }
-            });
-        }
-
-        // Utilitaires
+        // Auth functions
         function showLogin() {
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('registerScreen').classList.add('hidden');
@@ -1276,29 +1570,558 @@
         function showRegister() {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('registerScreen').classList.remove('hidden');
-            document.getElementById('appScreen').classList.add('hidden');
         }
 
         function showApp() {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('registerScreen').classList.add('hidden');
             document.getElementById('appScreen').classList.remove('hidden');
-            loadDashboard();
+            updateStats();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Demo login (replace with real Supabase auth)
+            if (email && password) {
+                db.currentUser = { email, name: 'Administrateur' };
+                localStorage.setItem('lab_user', JSON.stringify(db.currentUser));
+                showApp();
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const labName = document.getElementById('regLabName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            
+            // Save lab info
+            db.labInfo = { name: labName, email };
+            localStorage.setItem('lab_info', JSON.stringify(db.labInfo));
+            
+            // Auto login
+            db.currentUser = { email, name: 'Administrateur' };
+            localStorage.setItem('lab_user', JSON.stringify(db.currentUser));
+            
+            alert('Compte créé avec succès !');
+            showApp();
+        }
+
+        function logout() {
+            db.currentUser = null;
+            localStorage.removeItem('lab_user');
+            showLogin();
+        }
+
+        // Navigation
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(section + 'Section').classList.remove('hidden');
+            
+            // Update menu
+            document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
+            event.target.closest('li').classList.add('active');
+            
+            // Load section data
+            if (section === 'dashboard') updateStats();
+            if (section === 'patients') renderPatients();
+            if (section === 'analyses') renderAnalyses();
+            if (section === 'facturation') renderFactures();
+        }
+
+        // Patient management
+        function savePatient(e) {
+            e.preventDefault();
+            
+            const patient = {
+                id: Date.now().toString(),
+                prenom: document.getElementById('patPrenom').value,
+                nom: document.getElementById('patNom').value,
+                dateNaissance: document.getElementById('patDateNaissance').value,
+                sexe: document.getElementById('patSexe').value,
+                telephone: document.getElementById('patTelephone').value,
+                email: document.getElementById('patEmail').value,
+                adresse: document.getElementById('patAdresse').value,
+                dateInscription: new Date().toISOString()
+            };
+            
+            db.patients.push(patient);
+            localStorage.setItem('lab_patients', JSON.stringify(db.patients));
+            
+            closeModal('patientModal');
+            document.getElementById('patientForm').reset();
+            renderPatients();
+            updatePatientSelect();
+            updateStats();
+            
+            alert('Patient enregistré avec succès !');
+        }
+
+        function renderPatients() {
+            const tbody = document.getElementById('patientsTableBody');
+            if (!tbody) return;
+            
+            if (db.patients.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--gray);">Aucun patient enregistré</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = db.patients.map(p => {
+                const age = calculateAge(p.dateNaissance);
+                const initials = (p.prenom[0] + p.nom[0]).toUpperCase();
+                
+                return `
+                    <tr>
+                        <td>
+                            <div class="patient-info">
+                                <div class="patient-avatar">${initials}</div>
+                                <div class="patient-details">
+                                    <h4>${p.prenom} ${p.nom}</h4>
+                                    <p>ID: ${p.id.slice(-6)}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-size: 14px;">
+                                <div><i class="fas fa-phone" style="color: var(--primary); margin-right: 8px;"></i>${p.telephone}</div>
+                                ${p.email ? `<div style="margin-top: 4px; color: var(--gray);"><i class="fas fa-envelope" style="margin-right: 8px;"></i>${p.email}</div>` : ''}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-${p.sexe === 'M' ? 'homme' : 'femme'}">
+                                ${p.sexe === 'M' ? 'Homme' : 'Femme'}
+                            </span>
+                            <div style="margin-top: 4px; font-size: 12px; color: var(--gray);">${age} ans</div>
+                        </td>
+                        <td>${new Date(p.dateInscription).toLocaleDateString('fr-FR')}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button onclick="viewPatient('${p.id}')" title="Voir"><i class="fas fa-eye"></i></button>
+                                <button onclick="editPatient('${p.id}')" title="Modifier"><i class="fas fa-edit"></i></button>
+                                <button onclick="newAnalyseForPatient('${p.id}')" title="Nouvelle analyse"><i class="fas fa-vial"></i></button>
+                                <button onclick="deletePatient('${p.id}')" title="Supprimer" style="color: var(--danger);"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            updatePatientSelect();
+        }
+
+        function updatePatientSelect() {
+            const select = document.getElementById('anaPatient');
+            if (!select) return;
+            
+            select.innerHTML = '<option value="">Sélectionner un patient</option>' + 
+                db.patients.map(p => `<option value="${p.id}">${p.prenom} ${p.nom} (${p.telephone})</option>`).join('');
+        }
+
+        function searchPatients() {
+            const term = document.getElementById('searchPatients').value.toLowerCase();
+            const rows = document.querySelectorAll('#patientsTableBody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(term) ? '' : 'none';
+            });
+        }
+
+        // Analyse management
+        function showAnalyseFields() {
+            const type = document.getElementById('anaType').value;
+            
+            // Hide all fields
+            document.querySelectorAll('.analyse-fields').forEach(f => f.classList.add('hidden'));
+            
+            // Show specific fields
+            if (type === 'NFS') document.getElementById('nfsFields').classList.remove('hidden');
+            if (type === 'CRP') document.getElementById('crpFields').classList.remove('hidden');
+            if (type === 'WIDAL') document.getElementById('widalFields').classList.remove('hidden');
+        }
+
+        function saveAnalyse(e) {
+            e.preventDefault();
+            
+            const patientId = document.getElementById('anaPatient').value;
+            const patient = db.patients.find(p => p.id === patientId);
+            const type = document.getElementById('anaType').value;
+            
+            const analyse = {
+                id: Date.now().toString(),
+                patientId,
+                patientName: patient ? `${patient.prenom} ${patient.nom}` : '',
+                type,
+                medecin: document.getElementById('anaMedecin').value,
+                date: new Date().toISOString(),
+                statut: 'Validée',
+                results: {}
+            };
+            
+            // Capture specific results based on type
+            if (type === 'NFS') {
+                analyse.results = {
+                    leucocytes: document.getElementById('nfsLeuco').value,
+                    hematies: document.getElementById('nfsHema').value,
+                    hemoglobine: document.getElementById('nfsHemo').value,
+                    hematocrite: document.getElementById('nfsHemat').value,
+                    plaquettes: document.getElementById('nfsPlaq').value,
+                    neutrophiles: document.getElementById('nfsNeutro').value
+                };
+            } else if (type === 'CRP') {
+                analyse.results = {
+                    crp: document.getElementById('crpValue').value,
+                    interpretation: document.getElementById('crpInterp').value
+                };
+            } else if (type === 'WIDAL') {
+                analyse.results = {
+                    TO: document.getElementById('widalTO').value,
+                    TH: document.getElementById('widalTH').value,
+                    AO: document.getElementById('widalAO').value,
+                    AH: document.getElementById('widalAH').value,
+                    BO: document.getElementById('widalBO').value,
+                    BH: document.getElementById('widalBH').value
+                };
+            }
+            
+            analyse.notes = document.getElementById('anaNotes').value;
+            
+            db.analyses.push(analyse);
+            localStorage.setItem('lab_analyses', JSON.stringify(db.analyses));
+            
+            closeModal('analyseModal');
+            document.getElementById('analyseForm').reset();
+            document.querySelectorAll('.analyse-fields').forEach(f => f.classList.add('hidden'));
+            
+            renderAnalyses();
+            updateStats();
+            
+            // Show report
+            viewReport(analyse.id);
+            
+            alert('Analyse enregistrée avec succès !');
+        }
+
+        function renderAnalyses() {
+            const tbody = document.getElementById('analysesTableBody');
+            if (!tbody) return;
+            
+            if (db.analyses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">Aucune analyse enregistrée</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = db.analyses.map(a => `
+                <tr>
+                    <td>A-${a.id.slice(-6)}</td>
+                    <td>${a.patientName}</td>
+                    <td>${a.type}</td>
+                    <td>${new Date(a.date).toLocaleDateString('fr-FR')}</td>
+                    <td><span class="badge" style="background: #d1fae5; color: #065f46;">${a.statut}</span></td>
+                    <td>
+                        <div class="action-btns">
+                            <button onclick="viewReport('${a.id}')" title="Voir résultat"><i class="fas fa-eye"></i></button>
+                            <button onclick="printReport('${a.id}')" title="Imprimer"><i class="fas fa-print"></i></button>
+                            <button onclick="deleteAnalyse('${a.id}')" title="Supprimer" style="color: var(--danger);"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Report generation
+        function viewReport(analyseId) {
+            const analyse = db.analyses.find(a => a.id === analyseId);
+            if (!analyse) return;
+            
+            const patient = db.patients.find(p => p.id === analyse.patientId);
+            const lab = db.labInfo || {};
+            
+            let resultsHTML = '';
+            
+            if (analyse.type === 'NFS') {
+                const r = analyse.results;
+                resultsHTML = `
+                    <div class="report-section">
+                        <h4>HEMATOLOGIE - HEMOGRAMME</h4>
+                        <div class="result-row">
+                            <span>Leucocytes</span>
+                            <span>
+                                <span class="result-value ${r.leucocytes < 4 || r.leucocytes > 10 ? 'result-abnormal' : ''}">${r.leucocytes || '-'} x 10³/mm³</span>
+                                <span class="result-normal">N: 4,0 - 10,0</span>
+                            </span>
+                        </div>
+                        <div class="result-row">
+                            <span>Hématies</span>
+                            <span>
+                                <span class="result-value ${r.hematies < 4.2 || r.hematies > 5.4 ? 'result-abnormal' : ''}">${r.hematies || '-'} x 10⁶/mm³</span>
+                                <span class="result-normal">N: 4,2 - 5,4</span>
+                            </span>
+                        </div>
+                        <div class="result-row">
+                            <span>Hémoglobine</span>
+                            <span>
+                                <span class="result-value ${r.hemoglobine < 12 || r.hemoglobine > 16 ? 'result-abnormal' : ''}">${r.hemoglobine || '-'} g/dl</span>
+                                <span class="result-normal">N: 12 - 16</span>
+                            </span>
+                        </div>
+                        <div class="result-row">
+                            <span>Hématocrite</span>
+                            <span>
+                                <span class="result-value ${r.hematocrite < 37 || r.hematocrite > 47 ? 'result-abnormal' : ''}">${r.hematocrite || '-'} %</span>
+                                <span class="result-normal">N: 37 - 47</span>
+                            </span>
+                        </div>
+                        <div class="result-row">
+                            <span>Plaquettes</span>
+                            <span>
+                                <span class="result-value ${r.plaquettes < 150000 || r.plaquettes > 350000 ? 'result-abnormal' : ''}">${r.plaquettes || '-'} /mm³</span>
+                                <span class="result-normal">N: 150000 - 350000</span>
+                            </span>
+                        </div>
+                        <div class="result-row">
+                            <span>Neutrophiles</span>
+                            <span>
+                                <span class="result-value ${r.neutrophiles < 50 || r.neutrophiles > 75 ? 'result-abnormal' : ''}">${r.neutrophiles || '-'} %</span>
+                                <span class="result-normal">N: 50 - 75</span>
+                            </span>
+                        </div>
+                    </div>
+                `;
+            } else if (analyse.type === 'CRP') {
+                resultsHTML = `
+                    <div class="report-section">
+                        <h4>IMMUNO-BIOCHIMIE</h4>
+                        <div class="result-row">
+                            <span>CRP (Protéine C Réactive)</span>
+                            <span>
+                                <span class="result-value ${analyse.results.interpretation === 'positive' ? 'result-abnormal' : ''}">
+                                    ${analyse.results.interpretation === 'positive' ? 'POSITIVE à ' + analyse.results.crp : analyse.results.crp || '-'} mg/L
+                                </span>
+                                <span class="result-normal">N: 0 - 6 mg/L</span>
+                            </span>
+                        </div>
+                    </div>
+                `;
+            } else if (analyse.type === 'WIDAL') {
+                const r = analyse.results;
+                resultsHTML = `
+                    <div class="report-section">
+                        <h4>SERO-DIAGNOSTIC DE WIDAL ET FELIX</h4>
+                        <div class="result-row"><span>TO (Typhi O)</span><span class="result-value">${r.TO}</span></span></div>
+                        <div class="result-row"><span>TH (Typhi H)</span><span class="result-value">${r.TH}</span></span></div>
+                        <div class="result-row"><span>AO (Paratyphi A O)</span><span class="result-value">${r.AO}</span></span></div>
+                        <div class="result-row"><span>AH (Paratyphi A H)</span><span class="result-value">${r.AH}</span></span></div>
+                        <div class="result-row"><span>BO (Paratyphi B O)</span><span class="result-value">${r.BO}</span></span></div>
+                        <div class="result-row"><span>BH (Paratyphi B H)</span><span class="result-value">${r.BH}</span></span></div>
+                        <div style="margin-top: 16px; padding: 12px; background: #f8fafc; border-left: 4px solid var(--primary);">
+                            <strong>Conclusion:</strong> Séro-diagnostic ${r.TO !== 'negatif' || r.TH !== 'negatif' ? 'positif (suspicion de typhoïde)' : 'négatif'}
+                        </div>
+                    </div>
+                `;
+            } else {
+                resultsHTML = `
+                    <div class="report-section">
+                        <h4>RÉSULTATS</h4>
+                        <p>${analyse.notes || 'Aucun détail enregistré'}</p>
+                    </div>
+                `;
+            }
+            
+            const reportHTML = `
+                <div class="report-header">
+                    <h2>${lab.name || 'LabCloud Diagnostics'}</h2>
+                    <p>Laboratoire d'Analyses Biomédicales<br>
+                    ${lab.address || ''} - B.P: ${lab.bp || ''} ${lab.city || ''}<br>
+                    Tél: ${lab.phone || ''} - Email: ${lab.email || ''}</p>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 24px; padding: 16px; background: #f8fafc; border-radius: 8px;">
+                    <div>
+                        <strong>Patient:</strong> ${analyse.patientName}<br>
+                        <strong>N° Dossier:</strong> ${analyse.patientId.slice(-6)}<br>
+                        ${patient ? `<strong>Âge/Sexe:</strong> ${calculateAge(patient.dateNaissance)} ans / ${patient.sexe === 'M' ? 'Homme' : 'Femme'}` : ''}
+                    </div>
+                    <div style="text-align: right;">
+                        <strong>Date de prélèvement:</strong> ${new Date(analyse.date).toLocaleDateString('fr-FR')}<br>
+                        <strong>Médecin:</strong> ${analyse.medecin || 'Dr. EXTERNE'}<br>
+                        <strong>N° Analyse:</strong> A-${analyse.id.slice(-6)}
+                    </div>
+                </div>
+                
+                ${resultsHTML}
+                
+                <div style="margin-top: 40px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+                    <p>Exemplaire destiné au patient</p>
+                    <p style="margin-top: 8px;"><strong>Biologiste:</strong> ${lab.biologiste || 'Dr. Biologiste'} - Arrêté: ${lab.arrete || 'N°00000/MS'}</p>
+                    <p>${lab.city || 'Libreville'} - ${new Date().toLocaleDateString('fr-FR')}</p>
+                </div>
+            `;
+            
+            document.getElementById('reportContent').innerHTML = reportHTML;
+            openModal('reportModal');
+        }
+
+        function printReport() {
+            const content = document.getElementById('reportContent').innerHTML;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Résultat d'analyse</title>
+                    <style>
+                        body { font-family: 'Times New Roman', serif; padding: 40px; }
+                        .report-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
+                        .report-section { margin-bottom: 24px; }
+                        .report-section h4 { background: #f8fafc; padding: 8px 12px; border-left: 4px solid #0ea5e9; }
+                        .result-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dotted #ccc; }
+                        .result-value { font-weight: bold; }
+                        .result-normal { color: #059669; font-size: 12px; margin-left: 12px; }
+                        .result-abnormal { color: #dc2626; }
+                    </style>
+                </head>
+                <body>${content}</body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Simple PDF generation (you can enhance this)
+            doc.setFontSize(20);
+            doc.text('Résultat d\'analyse', 105, 20, { align: 'center' });
+            
+            doc.setFontSize(12);
+            const content = document.getElementById('reportContent').innerText;
+            const splitText = doc.splitTextToSize(content, 180);
+            doc.text(splitText, 15, 40);
+            
+            doc.save('resultat-analyse.pdf');
+        }
+
+        // Facturation
+        function renderFactures() {
+            const tbody = document.getElementById('facturesTableBody');
+            if (!tbody) return;
+            
+            if (db.factures.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">Aucune facture</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = db.factures.map(f => `
+                <tr>
+                    <td>F-${f.id.slice(-6)}</td>
+                    <td>${f.patientName}</td>
+                    <td>${new Date(f.date).toLocaleDateString('fr-FR')}</td>
+                    <td>${f.montant} FCFA</td>
+                    <td><span class="badge" style="background: ${f.statut === 'Payée' ? '#d1fae5' : '#fef3c7'}; color: ${f.statut === 'Payée' ? '#065f46' : '#92400e'};">${f.statut}</span></td>
+                    <td>
+                        <button onclick="viewFacture('${f.id}')" class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showFactureTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (tab === 'factures') {
+                document.getElementById('facturesTab').classList.remove('hidden');
+                document.getElementById('devisTab').classList.add('hidden');
+            } else {
+                document.getElementById('facturesTab').classList.add('hidden');
+                document.getElementById('devisTab').classList.remove('hidden');
+            }
+        }
+
+        // Settings
+        function showSettingsTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.settings-content').forEach(c => c.classList.add('hidden'));
+            document.getElementById('settings' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
+        }
+
+        function saveLabSettings() {
+            db.labInfo = {
+                name: document.getElementById('labName').value,
+                email: document.getElementById('labEmail').value,
+                phone: document.getElementById('labPhone').value,
+                website: document.getElementById('labWebsite').value,
+                bp: document.getElementById('labBP').value,
+                city: document.getElementById('labCity').value,
+                address: document.getElementById('labAddress').value
+            };
+            localStorage.setItem('lab_info', JSON.stringify(db.labInfo));
+            alert('Paramètres enregistrés !');
+        }
+
+        function saveUserSettings() {
+            alert('Profil mis à jour !');
+        }
+
+        function exportData() {
+            const data = {
+                patients: db.patients,
+                analyses: db.analyses,
+                factures: db.factures,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `labcloud-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function clearAllData() {
+            if (confirm('ATTENTION: Cette action supprimera définitivement toutes les données. Continuer ?')) {
+                localStorage.removeItem('lab_patients');
+                localStorage.removeItem('lab_analyses');
+                localStorage.removeItem('lab_factures');
+                localStorage.removeItem('lab_devis');
+                db = { patients: [], analyses: [], factures: [], devis: [] };
+                renderPatients();
+                renderAnalyses();
+                updateStats();
+                alert('Toutes les données ont été supprimées.');
+            }
+        }
+
+        // Utilities
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+            if (modalId === 'analyseModal') updatePatientSelect();
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add('hidden');
         }
 
-        function openPatientModal() {
-            document.getElementById('patientModal').classList.remove('hidden');
-        }
-
-        function openAnalyseModal() {
-            document.getElementById('analyseModal').classList.remove('hidden');
+        function updateStats() {
+            document.getElementById('statPatients').textContent = db.patients.length;
+            document.getElementById('statAnalyses').textContent = db.analyses.length;
+            document.getElementById('statFactures').textContent = db.factures.length;
+            
+            const revenus = db.factures.reduce((sum, f) => sum + (parseInt(f.montant) || 0), 0);
+            document.getElementById('statRevenus').textContent = revenus.toLocaleString() + ' FCFA';
         }
 
         function calculateAge(dateString) {
+            if (!dateString) return '-';
             const today = new Date();
             const birth = new Date(dateString);
             let age = today.getFullYear() - birth.getFullYear();
@@ -1307,25 +2130,57 @@
             return age;
         }
 
-        async function logout() {
-            await supabaseClient.auth.signOut();
-            currentUser = null;
-            currentLab = null;
-            showLogin();
+        function initCharts() {
+            const ctx1 = document.getElementById('revenueChart');
+            const ctx2 = document.getElementById('analysesChart');
+            
+            if (!ctx1 || !ctx2) return;
+            
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
+                    datasets: [{
+                        label: 'Revenus (kFCFA)',
+                        data: [520, 480, 690, 580, 640, 700],
+                        backgroundColor: '#0d9488',
+                        borderRadius: 4
+                    }, {
+                        label: 'Objectif',
+                        data: [450, 450, 450, 450, 450, 450],
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+            
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sérologie', 'Hématologie', 'Biochimie', 'Parasito'],
+                    datasets: [{
+                        data: [1, 1, 0, 0],
+                        backgroundColor: ['#0d9488', '#3b82f6', '#f59e0b', '#ef4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
         }
 
-        function searchPatients() {
-            const term = document.getElementById('searchPatients').value.toLowerCase();
-            const filtered = patients.filter(p => 
-                p.nom.toLowerCase().includes(term) || 
-                (p.telephone && p.telephone.includes(term))
-            );
-            renderPatientsTable(filtered);
-        }
-
-        async function loadFactures() {
-            // Implémentation factures à venir
-            document.getElementById('facturesList').innerHTML = '<tr><td colspan="6" class="empty">Module factures en développement</td></tr>';
+        // Close modals on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.add('hidden');
+            }
         }
     </script>
 </body>
