@@ -4,10 +4,531 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LabCloud - Gestion Laboratoire</title>
-    <link rel="stylesheet" href="css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* CSS INLINE COMPLET - Copiez tout le contenu de style.css ici */
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --success: #48bb78;
+            --warning: #ed8936;
+            --danger: #f56565;
+            --dark: #2d3748;
+            --gray: #718096;
+            --light: #f7fafc;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .auth-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 20px;
+        }
+        
+        .auth-container {
+            background: white;
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 420px;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .auth-logo i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .auth-logo h1 {
+            color: var(--dark);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .auth-logo p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+        
+        .auth-form .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 14px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--dark);
+        }
+        
+        .btn-block {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .auth-switch {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+        
+        .auth-switch a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        #appScreen {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            box-shadow: var(--shadow);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu li {
+            padding: 14px 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--gray);
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu li:hover {
+            background: #f7fafc;
+            color: var(--primary);
+        }
+        
+        .sidebar-menu li.active {
+            background: #f7fafc;
+            color: var(--primary);
+            border-left-color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .sidebar-menu li.logout {
+            margin-top: 20px;
+            color: var(--danger);
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+        }
+        
+        .top-header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .stat-info h3 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+        
+        .stat-info p {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .stat-change {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray);
+        }
+        
+        .stat-change.positive {
+            color: var(--success);
+        }
+        
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .chart-container h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-size: 18px;
+        }
+        
+        .recent-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .recent-box {
+            background: white;
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .recent-box h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .list-items {
+            space-y: 12px;
+        }
+        
+        .list-item {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .empty {
+            color: var(--gray);
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 16px;
+        }
+        
+        .section-header input,
+        .section-header select {
+            padding: 10px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            min-width: 250px;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        tr:hover {
+            background: #f7fafc;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+        
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            font-size: 20px;
+            color: var(--dark);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .modal form {
+            padding: 24px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .modal-footer {
+            padding: 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-en_cours {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .status-termine {
+            background: #d1fae5;
+            color: #059669;
+        }
+        
+        .status-livre {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        
+        @media (max-width: 1024px) {
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+            .recent-sections {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Login Screen -->
@@ -30,7 +551,7 @@
                 <button type="submit" class="btn btn-primary btn-block">
                     <i class="fas fa-sign-in-alt"></i> Connexion
                 </button>
-                <p class="auth-switch">Pas encore de compte ? <a href="#" onclick="showRegister()">S'inscrire</a></p>
+                <p class="auth-switch">Pas encore de compte ? <a href="#" onclick="showRegister(); return false;">S'inscrire</a></p>
             </form>
         </div>
     </div>
@@ -62,7 +583,7 @@
                 <button type="submit" class="btn btn-primary btn-block">
                     <i class="fas fa-user-plus"></i> Créer le compte
                 </button>
-                <p class="auth-switch">Déjà un compte ? <a href="#" onclick="showLogin()">Se connecter</a></p>
+                <p class="auth-switch">Déjà un compte ? <a href="#" onclick="showLogin(); return false;">Se connecter</a></p>
             </form>
         </div>
     </div>
@@ -373,6 +894,439 @@
         </div>
     </div>
 
-    <script src="js/app.js"></script>
+    <script>
+        // Configuration Supabase - REMPLACEZ PAR VOS CLÉS
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_KEY = 'your-anon-key';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // État global
+        let currentUser = null;
+        let currentLab = null;
+        let patients = [];
+        let analyses = [];
+        let revenueChart = null;
+        let analysesChart = null;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            
+            // Formulaires
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+        });
+
+        // Vérification auth
+        async function checkAuth() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                await loadUserProfile();
+                showApp();
+            } else {
+                showLogin();
+            }
+        }
+
+        // Connexion
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email,
+                    password
+                });
+                
+                if (error) throw error;
+                
+                currentUser = data.user;
+                await loadUserProfile();
+                showApp();
+            } catch (error) {
+                alert('Erreur de connexion: ' + error.message);
+            }
+        }
+
+        // Inscription
+        async function handleRegister(e) {
+            e.preventDefault();
+            const labName = document.getElementById('regLabName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const phone = document.getElementById('regPhone').value;
+            
+            try {
+                // 1. Créer l'utilisateur auth
+                const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+                    email,
+                    password
+                });
+                
+                if (authError) throw authError;
+                
+                // 2. Créer le laboratoire (company)
+                const { data: labData, error: labError } = await supabaseClient
+                    .from('laboratoires')
+                    .insert([{
+                        nom: labName,
+                        email: email,
+                        telephone: phone,
+                        statut: 'actif'
+                    }])
+                    .select()
+                    .single();
+                    
+                if (labError) throw labError;
+                
+                // 3. Créer le profil utilisateur
+                const { error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .insert([{
+                        id: authData.user.id,
+                        email: email,
+                        laboratoire_id: labData.id,
+                        role: 'admin',
+                        nom: labName
+                    }]);
+                    
+                if (profileError) throw profileError;
+                
+                alert('Compte créé avec succès! Vous pouvez maintenant vous connecter.');
+                showLogin();
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
+        }
+
+        // Charger profil utilisateur
+        async function loadUserProfile() {
+            const { data, error } = await supabaseClient
+                .from('profiles')
+                .select('*, laboratoires(*)')
+                .eq('id', currentUser.id)
+                .single();
+                
+            if (data) {
+                currentLab = data.laboratoires;
+                document.getElementById('userName').textContent = data.nom || data.email;
+            }
+        }
+
+        // Navigation
+        function showSection(section) {
+            // Cacher toutes les sections
+            document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(section + 'Section').classList.remove('hidden');
+            
+            // Mettre à jour menu actif
+            document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
+            event.target.closest('li').classList.add('active');
+            
+            // Mettre à jour titre
+            const titles = {
+                'dashboard': 'Tableau de bord',
+                'patients': 'Gestion des Patients',
+                'analyses': 'Analyses Médicales',
+                'factures': 'Facturation'
+            };
+            document.getElementById('pageTitle').textContent = titles[section];
+            
+            // Charger données spécifiques
+            if (section === 'dashboard') loadDashboard();
+            if (section === 'patients') loadPatients();
+            if (section === 'analyses') loadAnalyses();
+            if (section === 'factures') loadFactures();
+        }
+
+        // Dashboard
+        async function loadDashboard() {
+            if (!currentLab) return;
+            
+            // Stats
+            const { count: patientCount } = await supabaseClient
+                .from('patients')
+                .select('*', { count: 'exact', head: true })
+                .eq('laboratoire_id', currentLab.id);
+                
+            const { count: analyseCount } = await supabaseClient
+                .from('analyses')
+                .select('*', { count: 'exact', head: true })
+                .eq('laboratoire_id', currentLab.id);
+                
+            const { count: encoursCount } = await supabaseClient
+                .from('analyses')
+                .select('*', { count: 'exact', head: true })
+                .eq('laboratoire_id', currentLab.id)
+                .eq('statut', 'en_cours');
+            
+            document.getElementById('totalPatients').textContent = patientCount || 0;
+            document.getElementById('totalAnalyses').textContent = analyseCount || 0;
+            document.getElementById('analysesEnCours').textContent = (encoursCount || 0) + ' en cours';
+            
+            // Revenus
+            const { data: revenus } = await supabaseClient
+                .from('analyses')
+                .select('prix')
+                .eq('laboratoire_id', currentLab.id)
+                .eq('statut', 'paye');
+                
+            const totalRevenus = revenus?.reduce((sum, a) => sum + (a.prix || 0), 0) || 0;
+            document.getElementById('totalRevenus').textContent = totalRevenus.toLocaleString() + ' FCFA';
+            
+            // Charts
+            initCharts();
+        }
+
+        // Patients
+        async function loadPatients() {
+            if (!currentLab) return;
+            
+            const { data, error } = await supabaseClient
+                .from('patients')
+                .select('*')
+                .eq('laboratoire_id', currentLab.id)
+                .order('created_at', { ascending: false });
+                
+            if (data) {
+                patients = data;
+                renderPatientsTable(data);
+                updatePatientSelect(data);
+            }
+        }
+
+        function renderPatientsTable(data) {
+            const tbody = document.getElementById('patientsList');
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty">Aucun patient enregistré</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = data.map(p => `
+                <tr>
+                    <td>#${p.id.toString().slice(0,4)}</td>
+                    <td><strong>${p.nom}</strong></td>
+                    <td>${p.telephone || '-'}</td>
+                    <td>${p.email || '-'}</td>
+                    <td>${p.sexe === 'M' ? 'Masculin' : p.sexe === 'F' ? 'Féminin' : '-'}</td>
+                    <td>${p.date_naissance ? calculateAge(p.date_naissance) + ' ans' : '-'}</td>
+                    <td>
+                        <button class="btn btn-sm" onclick="editPatient('${p.id}')" style="padding: 6px 12px; font-size: 12px;"><i class="fas fa-edit"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updatePatientSelect(patients) {
+            const select = document.getElementById('anaPatient');
+            if (!select) return;
+            select.innerHTML = patients.map(p => 
+                `<option value="${p.id}">${p.nom} (${p.telephone || 'pas de tel'})</option>`
+            ).join('');
+        }
+
+        // Analyses
+        async function loadAnalyses() {
+            if (!currentLab) return;
+            
+            const filter = document.getElementById('filterStatus').value;
+            let query = supabaseClient
+                .from('analyses')
+                .select('*, patients(nom)')
+                .eq('laboratoire_id', currentLab.id)
+                .order('created_at', { ascending: false });
+                
+            if (filter) query = query.eq('statut', filter);
+            
+            const { data, error } = await query;
+            if (data) {
+                analyses = data;
+                renderAnalysesTable(data);
+            }
+        }
+
+        function renderAnalysesTable(data) {
+            const tbody = document.getElementById('analysesList');
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty">Aucune analyse enregistrée</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = data.map(a => `
+                <tr>
+                    <td>A-${a.id.toString().slice(0,4)}</td>
+                    <td>${a.patients?.nom || 'N/A'}</td>
+                    <td>${a.type_analyse}</td>
+                    <td>${new Date(a.created_at).toLocaleDateString('fr-FR')}</td>
+                    <td><span class="status status-${a.statut}">${a.statut.replace('_', ' ')}</span></td>
+                    <td>${a.prix?.toLocaleString()} FCFA</td>
+                    <td>
+                        <button class="btn btn-sm" style="padding: 6px 12px; font-size: 12px;"><i class="fas fa-eye"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Sauvegardes
+        async function savePatient(e) {
+            e.preventDefault();
+            if (!currentLab) return;
+            
+            const patient = {
+                laboratoire_id: currentLab.id,
+                nom: document.getElementById('patNom').value,
+                telephone: document.getElementById('patPhone').value,
+                email: document.getElementById('patEmail').value,
+                date_naissance: document.getElementById('patDateNaissance').value,
+                sexe: document.getElementById('patSexe').value,
+                groupe_sanguin: document.getElementById('patGroupeSanguin').value,
+                adresse: document.getElementById('patAdresse').value
+            };
+            
+            const { error } = await supabaseClient.from('patients').insert([patient]);
+            if (error) {
+                alert('Erreur: ' + error.message);
+            } else {
+                closeModal('patientModal');
+                loadPatients();
+                document.getElementById('patientForm').reset();
+            }
+        }
+
+        async function saveAnalyse(e) {
+            e.preventDefault();
+            if (!currentLab) return;
+            
+            const analyse = {
+                laboratoire_id: currentLab.id,
+                patient_id: document.getElementById('anaPatient').value,
+                type_analyse: document.getElementById('anaType').value,
+                medecin: document.getElementById('anaMedecin').value,
+                prix: parseInt(document.getElementById('anaPrix').value),
+                notes: document.getElementById('anaNotes').value,
+                statut: 'en_cours'
+            };
+            
+            const { error } = await supabaseClient.from('analyses').insert([analyse]);
+            if (error) {
+                alert('Erreur: ' + error.message);
+            } else {
+                closeModal('analyseModal');
+                loadAnalyses();
+                document.getElementById('analyseForm').reset();
+            }
+        }
+
+        // Charts
+        function initCharts() {
+            const ctx1 = document.getElementById('revenueChart');
+            const ctx2 = document.getElementById('analysesTypeChart');
+            
+            if (!ctx1 || !ctx2) return;
+            
+            if (revenueChart) revenueChart.destroy();
+            if (analysesChart) analysesChart.destroy();
+            
+            revenueChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
+                    datasets: [{
+                        label: 'Revenus (FCFA)',
+                        data: [150000, 230000, 180000, 320000, 290000, 450000],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+            
+            analysesChart = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['NFS', 'Biochimie', 'Sérologie', 'Urines', 'Autres'],
+                    datasets: [{
+                        data: [30, 25, 20, 15, 10],
+                        backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        // Utilitaires
+        function showLogin() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('registerScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.add('hidden');
+        }
+
+        function showRegister() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('registerScreen').classList.remove('hidden');
+            document.getElementById('appScreen').classList.add('hidden');
+        }
+
+        function showApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('registerScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.remove('hidden');
+            loadDashboard();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function openPatientModal() {
+            document.getElementById('patientModal').classList.remove('hidden');
+        }
+
+        function openAnalyseModal() {
+            document.getElementById('analyseModal').classList.remove('hidden');
+        }
+
+        function calculateAge(dateString) {
+            const today = new Date();
+            const birth = new Date(dateString);
+            let age = today.getFullYear() - birth.getFullYear();
+            const m = today.getMonth() - birth.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+            return age;
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            currentUser = null;
+            currentLab = null;
+            showLogin();
+        }
+
+        function searchPatients() {
+            const term = document.getElementById('searchPatients').value.toLowerCase();
+            const filtered = patients.filter(p => 
+                p.nom.toLowerCase().includes(term) || 
+                (p.telephone && p.telephone.includes(term))
+            );
+            renderPatientsTable(filtered);
+        }
+
+        async function loadFactures() {
+            // Implémentation factures à venir
+            document.getElementById('facturesList').innerHTML = '<tr><td colspan="6" class="empty">Module factures en développement</td></tr>';
+        }
+    </script>
 </body>
 </html>
